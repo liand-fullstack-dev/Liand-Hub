@@ -1,5 +1,5 @@
 const SERVER_URL = "https://feedback-monitor-production.up.railway.app"; 
-const API_KEY = "LND-5fa94ba3b6d86cc2d4beb51bf160fb8f;
+const API_KEY = "LND-5fa94ba3b6d86cc2d4beb51bf160fb8f";
 
 let DEVICE_ID = localStorage.getItem('liand_device_id');
 if (!DEVICE_ID) {
