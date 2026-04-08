@@ -1,6 +1,6 @@
 # 🚀 Liand Hub | Personal Portfolio & Feedback Ecosystem
 
-Selamat datang di **Liand Hub**, pusat ekosistem digital dan portofolio interaktif milik [Liand Al Haq](https://domainkamu.vercel.app). 
+Selamat datang di **Liand Hub**, pusat ekosistem digital dan portofolio interaktif milik [Liand Al Haq](https://liand-hub.vercel.app/). 
 
 Proyek ini bukan sekadar portofolio statis biasa. Liand Hub dirancang dengan arsitektur **Frontend modern yang responsif** dan ditenagai oleh **Custom Backend (Node.js/MongoDB)** untuk menangani interaksi pengunjung secara *real-time*.
 
@@ -19,4 +19,4 @@ Proyek ini bukan sekadar portofolio statis biasa. Liand Hub dirancang dengan ars
 
 ## 🤝 Mari Berkolaborasi!
 Tertarik dengan cara kerja di balik layar Liand Hub atau memiliki proyek modern yang ingin diwujudkan?
-👉 **[Kunjungi Liand Hub Sekarang](https://domainkamu.vercel.app)** atau hubungi saya melalui [Email](mailto:liand.fullstackdev@gmail.com).
+👉 **[Kunjungi Liand Hub Sekarang](https://liand-hub.vercel.app/)** atau hubungi saya melalui [Email](mailto:liand.fullstackdev@gmail.com).
