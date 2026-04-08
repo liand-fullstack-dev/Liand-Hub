@@ -476,7 +476,7 @@ async function loadProjectReviews(projectId) {
                 html += `<p style="color: #64748b; font-size: 0.9rem;">Belum ada ulasan. Jadilah yang pertama!</p>`;
             } else {
                 data.reviews.forEach(rev => {
-                    const mineBadge = rev.isMine ? `<span style="font-size:0.65rem; background:#3b82f6; color:white; padding:2px 6px; border-radius:4px; margin-left:6px;">Ulasan Anda</span>` : "";
+                    const mineBadge = rev.isMine ? `<span style="font-size:0.65rem; background:#3b82f6; color:white; padding:2px 8px; border-radius:12px; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; font-weight:600;"><i class="fa-solid fa-circle-check"></i> Ulasan Anda</span>` : "";
                     
                     let actionButtons = "";
                     if (rev.isMine) {
@@ -501,18 +501,28 @@ async function loadProjectReviews(projectId) {
                     }
 
                     html += `
-                    <div class="review-item" style="${rev.isMine ? 'border-left: 3px solid #3b82f6; padding-left: 10px; background: rgba(59, 130, 246, 0.05); padding-right: 10px; border-radius: 0 8px 8px 0;' : ''}">
-                      <div class="review-head">
-                        <div class="reviewer-info">
-                          <div class="avatar"><i class="fa-solid fa-user"></i></div>
-                          <div><span class="name">${sanitizeHTML(rev.name)}${mineBadge}</span> <span class="date">${timeAgo(rev.date)}</span></div>
-                        </div>
-                        <div class="stars-small">${renderStars(rev.rating)}</div>
-                      </div>
-                      <p class="review-text">${sanitizeHTML(rev.message)}</p>
-                      ${replyHtml} 
-                      ${actionButtons}
-                    </div>`;
+<div class="review-item" style="${rev.isMine ? 'border-left: 3px solid #3b82f6; padding-left: 12px; background: rgba(59, 130, 246, 0.05); padding-right: 12px; border-radius: 0 8px 8px 0;' : ''}">
+  <div class="review-head" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 8px;">
+    
+    <div class="reviewer-info" style="display: flex; gap: 12px; align-items: center; flex: 1;">
+      <div class="avatar" style="flex-shrink: 0; display:flex; justify-content:center; align-items:center;"><i class="fa-solid fa-user"></i></div>
+      
+      <div style="display: flex; flex-direction: column; gap: 3px;">
+        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+          <span class="name" style="font-weight: 600; line-height: 1;">${sanitizeHTML(rev.name)}</span> 
+          ${mineBadge}
+        </div>
+        <span class="date" style="font-size: 0.75rem; opacity: 0.7; line-height: 1;">${timeAgo(rev.date)}</span>
+      </div>
+    </div>
+
+    <div class="stars-small" style="flex-shrink: 0; margin-top: 2px;">${renderStars(rev.rating)}</div>
+  </div>
+  
+  <p class="review-text" style="margin-top: 6px; line-height: 1.5; opacity: 0.9;">${sanitizeHTML(rev.message)}</p>
+  ${replyHtml} 
+  ${actionButtons}
+</div>`;
                 });
             }
             container.innerHTML = html;
