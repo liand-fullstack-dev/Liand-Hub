@@ -1649,3 +1649,19 @@ body.dark-mode ::-webkit-scrollbar-thumb {
 body.dark-mode ::-webkit-scrollbar-thumb:hover {
     background: #60a5fa;
 }
+
+body.dark-mode .paragraf-support {
+  color: white;
+}
+
+.heading-feedback {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ flex-wrap: wrap; 
+ gap: 10px;
+}
+
+body.dark-mode .heading-feedback {
+  color: white !important;
+}
