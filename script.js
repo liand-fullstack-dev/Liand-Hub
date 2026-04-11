@@ -1,6 +1,3 @@
-const SERVER_URL = "https://feedback-monitor-production.up.railway.app"; 
-const API_KEY = "LND-5fa94ba3b6d86cc2d4beb51bf160fb8f";
-
 let DEVICE_ID = localStorage.getItem('liand_device_id');
 if (!DEVICE_ID) {
     DEVICE_ID = 'DEV-' + Math.random().toString(36).substr(2, 9) + Date.now();
@@ -264,9 +261,9 @@ if (feedbackForm && btnSubmit) {
                 base64Image = await convertImageToBase64(file);
             }
 
-            const response = await fetch(`${SERVER_URL}/api/feedback`, {
+            const response = await fetch(`/api/proxy/api/feedback`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'x-device-id': DEVICE_ID },
+                headers: { 'Content-Type': 'application/json', 'x-device-id': DEVICE_ID || 'unknown-device' },
                 body: JSON.stringify({ type, senderName: name, message, imageUrl: base64Image })
             });
 
@@ -337,9 +334,9 @@ async function initVisitorCounter() {
     try {
         let response;
         if (!hasVisited) {
-            response = await fetch(`${SERVER_URL}/api/visitors/increment`, { method: 'POST', headers: { 'Content-Type': 'application/json' }});
+            response = await fetch(`/api/proxy/api/visitors/increment`, { method: 'POST', headers: { 'Content-Type': 'application/json' }});
             localStorage.setItem('liand_hub_visited', 'true');
-        } else response = await fetch(`${SERVER_URL}/api/visitors`);
+        } else response = await fetch(`/api/proxy/api/visitors`);
         
         if (!response.ok) throw new Error("Gagal mengambil data");
         const data = await response.json();
@@ -356,7 +353,7 @@ async function checkServerStatus(elementId) {
     statusEl.className = "server-status"; statusEl.style.opacity = "1";
     statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menghubungkan...';
     try {
-        const response = await fetch(`${SERVER_URL}/api/status`, { method: 'GET', headers: { 'x-api-key': API_KEY }});
+        const response = await fetch(`/api/proxy/api/status`);
         if (response.ok && (await response.json()).status === "online") {
             statusEl.className = "server-status online"; statusEl.innerHTML = '<span class="dot"></span> Server Online';
         } else throw new Error("Offline");
@@ -427,8 +424,8 @@ async function loadProjectReviews(projectId) {
     container.innerHTML = `<p style="text-align:center; padding:20px; color:#64748b;"><i class="fa-solid fa-circle-notch fa-spin"></i> Menarik data ulasan...</p>`;
     
     try {
-        const res = await fetch(`${SERVER_URL}/api/reviews/${projectId}`, {
-            headers: { 'x-device-id': DEVICE_ID }
+        const res = await fetch(`/api/proxy/api/reviews/${projectId}`, {
+            headers: { 'x-device-id': DEVICE_ID || 'unknown-device' }
         });
         const data = await res.json();
         if (data.success) {
@@ -552,9 +549,9 @@ if (submitReviewBtn) {
             const method = isEditMode ? 'PUT' : 'POST';
             const endpoint = isEditMode ? '/api/feedback/client' : '/api/feedback';
             
-            const res = await fetch(`${SERVER_URL}${endpoint}`, {
+            const res = await fetch(`/api/proxy${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`, {
                 method: method,
-                headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'x-device-id': DEVICE_ID },
+                headers: { 'Content-Type': 'application/json', 'x-device-id': DEVICE_ID || 'unknown-device' },
                 body: JSON.stringify({ 
                     type: 'review', 
                     projectId: currentProjectId, 
@@ -585,9 +582,10 @@ window.deleteMyReview = async function() {
     if (!isConfirmed) return;
 
     try {
-        const res = await fetch(`${SERVER_URL}/api/feedback/client`, { 
+        const res = await fetch(`/api/proxy/api/feedback/client`, { 
             method: 'DELETE', 
-            headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'x-device-id': DEVICE_ID },
+            headers: { 'Content-Type': 'application/json', 
+            'x-device-id': DEVICE_ID || 'unknown-device' },
             body: JSON.stringify({ projectId: currentProjectId })
         });
         const data = await res.json();
@@ -618,7 +616,7 @@ async function initProjectCards() {
         if(!summaryDiv) return;
         
         try {
-            const res = await fetch(`${SERVER_URL}/api/reviews/${projectId}`);
+            const res = await fetch(`/api/proxy/api/reviews/${projectId}`);
             const data = await res.json();
             
             if (data.success) {
@@ -634,10 +632,6 @@ async function initProjectCards() {
         }
     });
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-    try { initVisitorCounter(); } catch(e) {}
-    try { initProjectCards(); } catch(e) {}
     
     const feedbackSection = document.querySelector('.card-feedback');
     if (feedbackSection && window.IntersectionObserver) {
@@ -692,7 +686,7 @@ window.addEventListener('load', () => {
 document.addEventListener("DOMContentLoaded", () => {
     try { initVisitorCounter(); } catch(e) {}
     try { initProjectCards(); } catch(e) {}
-    
+
     setInterval(() => {
         initVisitorCounter();
         initProjectCards();  
