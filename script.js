@@ -647,18 +647,17 @@ async function initProjectCards() {
     }
 });
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
     const loader = document.getElementById('loader-wrapper');
-    
+
     setTimeout(() => {
         if(loader) {
             loader.classList.add('loader-hidden');
-            setTimeout(() => {
-                loader.remove();
-            }, 600); 
+            setTimeout(() => loader.remove(), 600);
         }
-    }, 1800); 
+    }, 1000);
 });
+     
 
 document.querySelectorAll('.btn-trakteer').forEach(link => {
     link.addEventListener('click', function(e) {
