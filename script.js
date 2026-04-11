@@ -633,6 +633,10 @@ async function initProjectCards() {
     });
 }
     
+ document.addEventListener("DOMContentLoaded", () => {
+    initVisitorCounter();
+    initProjectCards();
+
     const feedbackSection = document.querySelector('.card-feedback');
     if (feedbackSection && window.IntersectionObserver) {
         const observer = new IntersectionObserver((entries) => {
