@@ -261,9 +261,9 @@ if (feedbackForm && btnSubmit) {
                 base64Image = await convertImageToBase64(file);
             }
 
-            const response = await fetch(`/api/proxy/api/feedback`, {
+            const response = await fetch(`/api/forward?route=feedback`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-device-id': DEVICE_ID || 'unknown-device' },
+                headers: { 'Content-Type': 'application/json', 'x-device-id': DEVICE_ID },
                 body: JSON.stringify({ type, senderName: name, message, imageUrl: base64Image })
             });
 
@@ -334,9 +334,9 @@ async function initVisitorCounter() {
     try {
         let response;
         if (!hasVisited) {
-            response = await fetch(`/api/proxy/api/visitors/increment`, { method: 'POST', headers: { 'Content-Type': 'application/json' }});
+            response = await fetch(`/api/forward?route=visitors/increment`, { method: 'POST', headers: { 'Content-Type': 'application/json' }});
             localStorage.setItem('liand_hub_visited', 'true');
-        } else response = await fetch(`/api/proxy/api/visitors`);
+        } else response = await fetch(`/api/forward?route=visitors`);
         
         if (!response.ok) throw new Error("Gagal mengambil data");
         const data = await response.json();
@@ -353,7 +353,7 @@ async function checkServerStatus(elementId) {
     statusEl.className = "server-status"; statusEl.style.opacity = "1";
     statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Menghubungkan...';
     try {
-        const response = await fetch(`/api/proxy/api/status`);
+        const response = await fetch(`/api/forward?route=status`, { method: 'GET',});
         if (response.ok && (await response.json()).status === "online") {
             statusEl.className = "server-status online"; statusEl.innerHTML = '<span class="dot"></span> Server Online';
         } else throw new Error("Offline");
@@ -424,8 +424,8 @@ async function loadProjectReviews(projectId) {
     container.innerHTML = `<p style="text-align:center; padding:20px; color:#64748b;"><i class="fa-solid fa-circle-notch fa-spin"></i> Menarik data ulasan...</p>`;
     
     try {
-        const res = await fetch(`/api/proxy/api/reviews/${projectId}`, {
-            headers: { 'x-device-id': DEVICE_ID || 'unknown-device' }
+        const res = await fetch(`/api/forward?route=reviews/` + projectId, {
+            headers: { 'x-device-id': DEVICE_ID }
         });
         const data = await res.json();
         if (data.success) {
@@ -547,11 +547,11 @@ if (submitReviewBtn) {
 
         try {
             const method = isEditMode ? 'PUT' : 'POST';
-            const endpoint = isEditMode ? '/api/feedback/client' : '/api/feedback';
+            const routeTarget = isEditMode ? 'feedback/client' : 'feedback'; 
             
-            const res = await fetch(`/api/proxy${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`, {
+            const res = await fetch(`/api/forward?route=${routeTarget}`, {
                 method: method,
-                headers: { 'Content-Type': 'application/json', 'x-device-id': DEVICE_ID || 'unknown-device' },
+                headers: { 'Content-Type': 'application/json', 'x-device-id': DEVICE_ID },
                 body: JSON.stringify({ 
                     type: 'review', 
                     projectId: currentProjectId, 
@@ -582,10 +582,9 @@ window.deleteMyReview = async function() {
     if (!isConfirmed) return;
 
     try {
-        const res = await fetch(`/api/proxy/api/feedback/client`, { 
+        const res = await fetch(`/api/forward?route=feedback/client`, { 
             method: 'DELETE', 
-            headers: { 'Content-Type': 'application/json', 
-            'x-device-id': DEVICE_ID || 'unknown-device' },
+            headers: { 'Content-Type': 'application/json', 'x-device-id': DEVICE_ID },
             body: JSON.stringify({ projectId: currentProjectId })
         });
         const data = await res.json();
@@ -616,7 +615,7 @@ async function initProjectCards() {
         if(!summaryDiv) return;
         
         try {
-            const res = await fetch(`/api/proxy/api/reviews/${projectId}`);
+            const res = await fetch(`/api/forward?route=reviews/${projectId}`);
             const data = await res.json();
             
             if (data.success) {
@@ -632,11 +631,11 @@ async function initProjectCards() {
         }
     });
 }
-    
- document.addEventListener("DOMContentLoaded", () => {
-    initVisitorCounter();
-    initProjectCards();
 
+document.addEventListener("DOMContentLoaded", () => {
+    try { initVisitorCounter(); } catch(e) {}
+    try { initProjectCards(); } catch(e) {}
+    
     const feedbackSection = document.querySelector('.card-feedback');
     if (feedbackSection && window.IntersectionObserver) {
         const observer = new IntersectionObserver((entries) => {
@@ -651,17 +650,18 @@ async function initProjectCards() {
     }
 });
 
-document.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('load', function() {
     const loader = document.getElementById('loader-wrapper');
-
+    
     setTimeout(() => {
         if(loader) {
             loader.classList.add('loader-hidden');
-            setTimeout(() => loader.remove(), 600);
+            setTimeout(() => {
+                loader.remove();
+            }, 600); 
         }
-    }, 1000);
+    }, 1800); 
 });
-     
 
 document.querySelectorAll('.btn-trakteer').forEach(link => {
     link.addEventListener('click', function(e) {
@@ -689,7 +689,7 @@ window.addEventListener('load', () => {
 document.addEventListener("DOMContentLoaded", () => {
     try { initVisitorCounter(); } catch(e) {}
     try { initProjectCards(); } catch(e) {}
-
+    
     setInterval(() => {
         initVisitorCounter();
         initProjectCards();  
