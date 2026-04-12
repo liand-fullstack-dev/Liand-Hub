@@ -1,28 +1,29 @@
 export default async function handler(req, res) {
-  const { SERVER_URL, API_KEY } = process.env;
+  const railwayUrl = process.env.RAILWAY_URL; 
+  const apiKey = process.env.API_KEY; 
+  const route = req.query.route; 
 
-  const url = `${SERVER_URL}${req.url.replace('/api/proxy', '')}`;
+  if (!route) return res.status(400).json({ error: "Route tidak valid" });
+
+  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-api-key': apiKey,
+    'x-device-id': req.headers['x-device-id'] || 'unknown',
+    'x-forwarded-for': clientIp 
+  };
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(`${railwayUrl}/api/${route}`, {
       method: req.method,
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        'x-device-id': req.headers['x-device-id'] || ''
-      },
-      body: ['POST', 'PUT', 'DELETE'].includes(req.method)
-        ? JSON.stringify(req.body)
-        : undefined
+      headers: headers,
+      body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req.body) : undefined
     });
 
-    const data = await response.text();
-
-    res.status(response.status).send(data);
+    const data = await response.json();
+    res.status(response.status).json(data);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Proxy error'
-    });
+    res.status(500).json({ error: "Gagal terhubung ke Server Utama" });
   }
 }
