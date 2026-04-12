@@ -1,6 +1,6 @@
 
 export default async function handler(req, res) {
-  const railwayUrl = process.env.RAILWAY_URL; 
+  const railwayUrl = process.env.SERVER_URL; 
   const apiKey = process.env.API_KEY; 
   const route = req.query.route; 
 
